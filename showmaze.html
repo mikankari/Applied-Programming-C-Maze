@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style type="text/css">
+table{
+	border-collapse: collapse;
+}
+td{
+	border: 1px solid #666666;
+	width: 4px;
+	height: 4px;
+}
+</style>
+<script type="text/javascript" src="maze.js"></script>
+<script type="text/javascript">
+var maze;
+
+function init(){
+	maze = new Maze();
+	maze.importData(maze.readFile(maze.filename2));
+
+	updateMazeTable();
+}
+
+function updateMazeTable(){
+	var html = '';
+	for(var i = 0; i < maze.data.length; i++){
+		html += '<tr>';
+		for(var j = 0; j < maze.data[i].length; j++){
+			var color;
+			switch(maze.data[i][j]){
+				case 0:	color = "#ffffff";	break;
+				case 1:	color = "#666666";	break;
+				case 2:	color = "#6666ff";	break;
+				case 3:	color = "#ff6666";	break;
+				case 5:	color = "#66ff66";	break;
+			}
+			html += '<td style="background-color:' + color + ';"></td>';
+		}
+		html += '</tr>'
+	}
+	var maze_table = document.getElementById("maze_table");
+	maze_table.innerHTML = html;
+}
+
+window.addEventListener("load", init, false);
+
+</script>
+<title></title>
+</head>
+
+<body>
+<div id="maze">
+<table id="maze_table"></table>
+</div>
+</body>
+</html>
