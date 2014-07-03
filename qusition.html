@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style type="text/css">
+table{
+	border-collapse: collapse;
+}
+td{
+	border: 1px solid #666666;
+	width: 4px;
+	height: 4px;
+}
+</style>
+<script type="text/javascript" src="maze.js"></script>
+<script type="text/javascript">
+// todo書いておくべきでしたねはい
+
+var maze;
+var answer_timer;
+var update_timer;
+var highspeed = true;
+
+function init(){
+	// 新規迷路を生成する
+	maze = new Maze();
+
+	// 穴掘り法
+	for(var i = 1; i < maze.data.length - 1; i++){
+		for(var j = 1; j < maze.data[i].length - 1; j++){
+			if(maze.data[i][j] != 2 && maze.data[i][j] != 3){
+				maze.data[i][j] = 1;
+			}
+		}
+	}
+	answer_timer = window.setInterval('questionWithPutwall()', highspeed ? 0 : 25);
+
+	// 独自アルゴリズム
+	// for (var i = 1; i < maze.data.length - 1; i++) {
+	// 	if(i % 5 != 0){
+	// 	maze.playerY = i;
+	// 	var count = 3;
+	// 	for (var j = 0; j < count; j++) {
+	// 		var from = Math.floor(maze.data[i].length / count) * j;
+	// 		from += Math.floor(Math.random() * 5) + 0;
+	// 		maze.playerX = from;
+	// 		var length = Math.floor(Math.random() * 2) + 2;
+	// 		for (var k = 0; k < length; k++) {
+	// 			maze.movePlayer(2, "putwall");
+	// 		}
+	// 	}
+	// 	}
+	// }
+	// declearVictory();
+
+	update_timer = window.setInterval('updateMazeTable()', highspeed ? 5000 : 25);
+	updateMazeTable();
+}
+
+function questionWithPutwall(){
+	var result = maze.movePlayer(0, "putway2");
+	if(!result){
+		change();
+	}
+	if(maze.isFinish){
+		declearVictory();
+	}
+}
+
+function change(){
+	var i;
+	for(i = 0; ; i++){
+		maze.playerX = Math.floor(Math.random() * maze.data[0].length);
+		maze.playerY = Math.floor(Math.random() * maze.data.length);
+		if(maze.data[maze.playerY][maze.playerX] == 0 && maze.playerX % 2 == 1 && maze.playerY % 2 == 1 && maze.getUnmoveable2().length >= 1){
+			break;
+		}
+	}
+}
+
+function declearVictory(){
+	window.clearInterval(answer_timer);
+	window.clearInterval(update_timer);
+	updateMazeTable();
+	var html = '';
+	html += '書き出しました。歩数：' + maze.playerCounter + '';
+	var maze_text = document.getElementById("maze_text");
+	maze_text.innerHTML = html;
+	maze.writeFile(maze.filename, maze.data);
+}
+
+function updateMazeTable(){
+	var html = '';
+	for(var i = 0; i < maze.data.length; i++){
+		html += '<tr>';
+		for(var j = 0; j < maze.data[i].length; j++){
+			var color;
+			switch(maze.data[i][j]){
+				case 0:	color = "#ffffff";	break;
+				case 1:	color = "#666666";	break;
+				case 2:	color = "#6666ff";	break;
+				case 3:	color = "#ff6666";	break;
+				case 5:	color = "#66ff66";	break;
+			}
+			html += '<td style="background-color:' + color + ';"></td>';
+		}
+		html += '</tr>'
+	}
+	var maze_table = document.getElementById("maze_table");
+	maze_table.innerHTML = html;
+}
+
+window.addEventListener("load", init, false);
+
+</script>
+<title></title>
+</head>
+
+<body>
+<div id="maze">
+<table id="maze_table"></table>
+<div id="maze_text"></div>
+</div>
+</body>
+</html>
